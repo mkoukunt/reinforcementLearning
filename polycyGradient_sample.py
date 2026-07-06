@@ -4,6 +4,8 @@ import torch.optim as optim
 from torch.distributions import Categorical
 import gymnasium as gym
 import numpy as np
+import GridWorldEnv
+
 
 
 class PolicyNetwork(nn.Module):
@@ -22,7 +24,7 @@ class PolicyNetwork(nn.Module):
 
 def train_policy_gradient():
     # 1. Environment & Hyperparameters initialization
-    env = gym.make('CartPole-v1')
+    env = gym.make('gymnasium_env/GridWorld-v0')
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
 
