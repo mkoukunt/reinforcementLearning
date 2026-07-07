@@ -19,13 +19,23 @@ class PolicyNetwork(nn.Module):
         )
 
     def forward(self, state):
+        #print(state)
         return self.network(state)
+
+
+def obs_to_tensor(obs):
+    # Flatten the Dict observation ({"agent": [x, y], "target": [x, y]})
+    # into a single 1D float tensor for the policy network.
+    return torch.FloatTensor(
+        np.concatenate([obs["agent"], obs["target"]]).astype(np.float32)
+    )
 
 
 def train_policy_gradient():
     # 1. Environment & Hyperparameters initialization
     env = gym.make('gymnasium_env/GridWorld-v0')
-    state_dim = env.observation_space.shape[0]
+    # Dict observation has no .shape; sum the size of each sub-space.
+    state_dim = sum(space.shape[0] for space in env.observation_space.spaces.values())
     action_dim = env.action_space.n
 
     gamma = 0.99
@@ -37,6 +47,7 @@ def train_policy_gradient():
 
     for episode in range(num_episodes):
         state, _ = env.reset()
+        print(state)
         log_probs = []
         rewards = []
         done = False
@@ -44,7 +55,7 @@ def train_policy_gradient():
 
         # 2. Collect a full episode trajectory
         while not (done or truncated):
-            state_t = torch.FloatTensor(state)
+            state_t = obs_to_tensor(state)
             action_probs = policy(state_t)
 
             # Create a categorical distribution to sample actions
@@ -89,8 +100,28 @@ def train_policy_gradient():
 
     env.close()
     with torch.no_grad():
-        action_probs = policy(state_t)
-        print(f"Action Probabilities: {action_probs.numpy()}")
+        state, _ = env.reset()
+        state = obs_to_tensor(state)
+        x=0
+        y=0
+        while x!=4 or  y!=4:
+            action_probs = policy(state)
+            #print(f"Action Probabilities: {action_probs.numpy()}")
+            #print(f"Action Probabilities: {sum(action_probs.numpy())}")
+            max_idx = np.argmax(action_probs.numpy())
+            print(max_idx)
+            if max_idx==0:
+                state=state+torch.tensor([0,1,0,0])
+                y=y+1
+            if max_idx == 3:
+                state = state + torch.tensor([1, 0, 0, 0])
+                x=x+1
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
