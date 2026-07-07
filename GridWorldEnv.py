@@ -107,8 +107,7 @@ class GridWorldEnv(gym.Env):
 
         # Check if agent reached the target
         terminated = np.array_equal(self._agent_location, self._target_location)
-        if terminated :
-            print(terminated)
+
 
         # We don't use truncation in this simple environment
         # (could add a step limit here if desired)

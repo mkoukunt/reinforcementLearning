@@ -33,13 +33,22 @@ class QNetwork(nn.Module):
 
     def forward(self, x):
         return self.network(x)
-def obs_to_tensor(obs):
+def obs_to_tensor1(obs):
     # Flatten the Dict observation ({"agent": [x, y], "target": [x, y]})
     # into a single 1D float tensor for the policy network.
     return torch.FloatTensor(
-        tuple.
-        np.concatenate([obs[0]["agent"], obs[0]["target"]]).astype(np.float32)
+        np.concatenate([obs["agent"], obs["target"]]).astype(np.float32)
     )
+def obs_to_tensor(obs):
+    # Iterate over the tuple of Dict observations
+    # ({"agent": [x, y], "target": [x, y]}), flattening each into a
+    # 4-element [agent_x, agent_y, target_x, target_y] row, and stack
+    # them into a (64, 4) float tensor for the policy network.
+    rows = [
+        np.concatenate([o["agent"], o["target"]]).astype(np.float32)
+        for o in obs
+    ]
+    return torch.FloatTensor(np.stack(rows))
 
 # --- 2. Replay Buffer ---
 class ReplayBuffer:
@@ -86,7 +95,7 @@ class DQNAgent:
             return random.randint(0, self.action_dim - 1)
         else:
             with torch.no_grad():
-                state_t = torch.FloatTensor(state).unsqueeze(0)
+                state_t = obs_to_tensor1(state).unsqueeze(0)
                 q_values = self.policy_net(state_t)
                 return q_values.argmax().item()
 
@@ -121,7 +130,7 @@ if __name__ == "__main__":
     #state_dim = env.observation_space.shape[0]
     state_dim = sum(space.shape[0] for space in env.observation_space.spaces.values())
     action_dim = env.action_space.n
-    action_dim = env.action_space.n
+
 
     agent = DQNAgent(state_dim, action_dim)
     num_episodes = 200
@@ -156,3 +165,10 @@ if __name__ == "__main__":
 
     env.close()
     print("Training Complete!")
+    with torch.no_grad():
+        state, _ = env.reset()
+        state = obs_to_tensor1(state)
+        a=agent.target_net(state)
+        print(a)
+
+
