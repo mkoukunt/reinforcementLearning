@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
 
     agent = DQNAgent(state_dim, action_dim)
-    num_episodes = 200
+    num_episodes = 1000
 
     for episode in range(num_episodes):
         state, _ = env.reset()
@@ -168,7 +168,39 @@ if __name__ == "__main__":
     with torch.no_grad():
         state, _ = env.reset()
         state = obs_to_tensor1(state)
-        a=agent.target_net(state)
+        a=agent.target_net(state).argmax().item()
         print(a)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a,state)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a,state)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a, state)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a, state)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a,state)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a,state)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a, state)
+        state, reward, done, truncated, _ = env.step(a)
+        state = obs_to_tensor1(state)
+        a = agent.target_net(state).argmax().item()
+        print(a, state)
 
 
