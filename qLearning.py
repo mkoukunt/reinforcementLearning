@@ -31,7 +31,7 @@ def take_action(state, action):
         reward = 10
         done = True
     else:
-        reward = 0 # Negative reward penalty to encourage speed
+        reward = -1  # Negative reward penalty to encourage speed
         done = False
 
     return next_state, reward, done
